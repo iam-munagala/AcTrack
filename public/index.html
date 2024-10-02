@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Activity Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <ul><div class="logo">
+                <h2>AcTrack.</h2>
+            </div>
+            
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Activity</a></li>
+                <li><a href="#">Screenshots</a></li>
+                <li><a href="#">Settings</a></li>
+            </ul>
+        </nav>
+
+        <div class="dashboard-content">
+            <header class="dashboard-header">
+                <h1>User Activity Dashboard</h1>
+                <div id="date-time"></div>
+                <div class="action-buttons">
+                    <button onclick="showModal('create-project-modal')">Create a Project</button>
+                    <button onclick="showModal('track-time-modal')">Track Time</button>
+                    <button onclick="showModal('invite-team-modal')">Invite Your Team</button>
+                    <button onclick="showModal('settings-modal')">Settings</button>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Worked This Week</h3>
+                    <p id="worked-time">0 hrs 0 mins</p>
+                </div>
+                <div class="card">
+                    <h3>Idle Time This Week</h3>
+                    <p id="idle-time">0 hrs 0 mins</p>
+                </div>
+                <div class="card">
+                    <h3 >Projects Worked</h3>
+                    <p id="projects-worked" >Loading...</p>
+                </div>
+            </div>
+
+            <div class="flex-container">
+                <div class="screenshot-container" id="screenshot-container">
+                    <h3>Recent Screenshots</h3>
+                    <button id="capture-screenshot-btn">Capture Screenshot</button>  <!-- New button -->
+                    <div class="screenshots" id="recent-screenshots">
+                        <!-- Screenshots will be displayed here -->
+                    </div>
+                </div>
+                
+
+                <div class="graph-container">
+                    <h3>Activity Graph</h3>
+                    <canvas id="activity-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal" id="create-project-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('create-project-modal')">&times;</span>
+            <h2>Create a Project</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <button class="tab-link active" onclick="openTab(event, 'general')">General</button>
+                <button class="tab-link" onclick="openTab(event, 'members')">Members</button>
+                <button class="tab-link" onclick="openTab(event, 'budget-limits')">Budget & Limits</button>
+                <button class="tab-link" onclick="openTab(event, 'teams')">Teams</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="general" class="tab-content active">
+                <input type="text" placeholder="Project Name" id="project-name" required>
+                <input type="text" placeholder="Client Name" id="client-name" required>
+                <label>Billable?</label>
+                <input type="checkbox" id="billable">
+                <div class="modal-footer">
+                    <button onclick="openTab(event, 'members')">Next</button>
+                    <button onclick="closeModal('create-project-modal')">Cancel</button>
+                </div>
+            </div>
+
+            <div id="members" class="tab-content">
+                <input type="search" placeholder="Search Managers" id="managers">
+                <input type="search" placeholder="Search Users" id="users">
+                <input type="search" placeholder="Search Viewers" id="viewers">
+                <div class="modal-footer">
+                    <button onclick="openTab(event, 'budget-Limits')">Next</button>
+                    <button onclick="closeModal('create-project-modal')">Cancel</button>
+                </div>
+            </div>
+
+            <div id="budget-limits" class="tab-content">
+                <label>Type</label>
+                <select id="budget-type">
+                    <option>Total Cost</option>
+                    <option>Total Hours</option>
+                </select>
+
+                <label>Based On</label>
+                <select id="based-on">
+                    <option>Bill Rate</option>
+                    <option>Pay Rate</option>
+                </select>
+
+                <input type="number" placeholder="Cost" id="budget-cost">
+                <div class="modal-footer">
+                    <button onclick="openTab(event, 'teams')">Next</button>
+                    <button onclick="closeModal('create-project-modal')">Cancel</button>
+                </div>
+            </div>
+
+            <div id="teams" class="tab-content">
+                <input type="search" placeholder="Search Teams" id="teams-search">
+                <div class="modal-footer">
+                    <button onclick="saveDetails()">Save</button>
+                    <button onclick="closeModal('create-project-modal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Track Time Modal -->
+    <div class="modal" id="track-time-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('track-time-modal')">&times;</span>
+            <h2>Track Time</h2>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <button class="tab-link active" onclick="openTab(event, 'web-timer')">Web Timer</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="web-timer" class="tab-content active">
+                <p>Using the web timer in your browser allows you and your team to track time to projects and to-dos. The web timer does not record activity, screenshots, apps, or URLs.</p>
+                <button onclick="showModal('web-timer-modal')">Open Web Timer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="web-timer-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('web-timer-modal')">&times;</span>
+            <h2>Web Timer</h2>
+    
+            <div class="timer-container">
+                <div class="timer" id="timer-display">00:00:00</div>
+                <button id="play-pause-btn" class="play-pause-btn" onclick="toggleTimer()">▶️</button>
+            </div>
+    
+            <!-- Select Project Dropdown -->
+            <label for="project-select">Select Project:</label>
+            <select id="project-select">
+                <option value="" disabled selected>Select a project</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+    
+            <div class="modal-footer">
+                <button id="start-timer-btn" onclick="startTimer()">Start</button>
+                <button onclick="closeModal('web-timer-modal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="modal" id="invite-team-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('invite-team-modal')">&times;</span>
+            <h2>Invite Your Team</h2>
+            <input type="email" placeholder="Team Member Email" required>
+            <button>Send Invitation</button>
+        </div>
+    </div>
+
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('settings-modal')">&times;</span>
+            <h2>Settings</h2>
+            <input type="text" placeholder="Setting Name" required>
+            <button>Save</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let timerInterval;
+        let isTimerRunning = false;
+        let secondsElapsed = 0;
+
+        // Function to show modal
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        // Function to close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            resetTimer(); // Reset timer when closing the web timer modal
+        }
+
+        // Function to switch between tabs
+        function openTab(event, tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+
+            // Remove active class from all tab buttons
+            const tabLinks = document.querySelectorAll('.tab-link');
+            tabLinks.forEach(link => link.classList.remove('active'));
+
+            // Set clicked tab button as active
+            event.currentTarget.classList.add('active');
+        }
+
+        // Timer functions
+        function toggleTimer() {
+            if (isTimerRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            isTimerRunning = true;
+            document.getElementById('play-pause-btn').innerHTML = '⏸️';
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById('timer-display').innerText = formatTime(secondsElapsed);
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isTimerRunning = false;
+            document.getElementById('play-pause-btn').innerHTML = '▶️';
+            clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            secondsElapsed = 0;
+            document.getElementById('timer-display').innerText = '00:00:00';
+            pauseTimer();
+        }
+
+        function formatTime(seconds) {
+            const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(seconds % 60).padStart(2, '0');
+            return `${hours}:${minutes}:${secs}`;
+        }
+
+        function saveTimer() {
+            const project = document.getElementById('project-search').value;
+            const todo = document.getElementById('todo-search').value;
+            const timeSpent = secondsElapsed;
+
+            fetch('http://localhost:3001/timer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ project, todo, timeSpent }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Timer data saved successfully!');
+                closeModal('web-timer-modal');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function saveDetails() {
+            const projectName = document.getElementById('project-name').value;
+            const clientName = document.getElementById('client-name').value;
+            const isBillable = document.getElementById('billable').checked;
+            const managers = document.getElementById('managers').value;
+            const users = document.getElementById('users').value;
+            const viewers = document.getElementById('viewers').value;
+            const budgetType = document.getElementById('budget-type').value;
+            const basedOn = document.getElementById('based-on').value;
+            const cost = document.getElementById('budget-cost').value;
+            const teamsSearch = document.getElementById('teams-search').value;
+
+
+            fetch('http://localhost:3001/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ projectName, clientName, isBillable, managers, users, viewers,budgetType, basedOn, cost ,teamsSearch }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Details saved successfully!');
+                closeModal('create-project-modal');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Example: Date and Time display
+        setInterval(() => {
+            document.getElementById('date-time').innerText = new Date().toLocaleString();
+        }, 1000);
+
+        // Example: Chart.js for activity graph
+        const ctx = document.getElementById('activity-chart').getContext('2d');
+        const activityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Activity',
+                    data: [12, 19, 3, 5, 2, 3, 7],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false,
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+    fetchProjectCount();
+});
+
+function fetchProjectCount() {
+    fetch('http://localhost:3001/projects/count')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('projects-worked').innerText = data.count;
+        })
+        .catch(error => {
+            console.error('Error fetching project count:', error);
+        });
+}
+
+    </script>
+    <script>
+
+
+// Function to filter projects based on input
+function filterProjects() {
+    const input = document.getElementById('project-search').value.toLowerCase();
+    const projectList = document.getElementById('project-list');
+    projectList.innerHTML = ''; // Clear previous list
+    if (input.length === 0) {
+        projectList.style.display = 'none'; // Hide list if input is empty
+        return;
+    }
+
+    const filteredProjects = projects.filter(project => project.name.toLowerCase().includes(input));
+    if (filteredProjects.length > 0) {
+        filteredProjects.forEach(project => {
+            const div = document.createElement('div');
+            div.textContent = project.name; // Display project name
+            div.onclick = () => selectProject(project); // Set click handler to select project
+            projectList.appendChild(div);
+        });
+        projectList.style.display = 'block'; // Show filtered project list
+    } else {
+        projectList.style.display = 'none'; // Hide if no matches
+    }
+}
+
+// Function to select a project from the list
+function selectProject(project) {
+    document.getElementById('project-search').value = project.name; // Set input value
+    document.getElementById('project-list').style.display = 'none'; // Hide project list
+}
+
+// Timer functions
+function toggleTimer() {
+    if (isTimerRunning) {
+        pauseTimer();
+    } else {
+        startTimer();
+    }
+}
+
+        let projects = [];
+
+        // Fetch projects from the server and populate the dropdown
+        function fetchProjects() {
+            fetch('http://localhost:3001/projects')
+                .then(response => response.json())
+                .then(data => {
+                    projects = data; // Store projects
+                    const projectSelect = document.getElementById('project-select');
+                    projectSelect.innerHTML = '<option value="" disabled selected>Select a project</option>'; // Clear existing options
+
+                    // Populate dropdown with project names
+                    projects.forEach(project => {
+                        const option = document.createElement('option');
+                        option.value = project._id; // Use project ID as the value
+                        option.textContent = project.projectName; // Display project name
+                        projectSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching projects:', error);
+                });
+        }
+
+        // Show modal and fetch projects when opening the web-timer modal
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            if (modalId === 'web-timer-modal') {
+                fetchProjects(); // Fetch projects when opening the web-timer modal
+            }
+        }
+
+        // Timer functions
+        function startTimer() {
+            const projectSelect = document.getElementById('project-select');
+            const projectId = projectSelect.value;
+
+            if (!projectId) {
+                alert('Please select a project before starting the timer.');
+                return;
+            }
+
+            // Start the timer logic (existing code)
+            isTimerRunning = true;
+            document.getElementById('play-pause-btn').innerHTML = '⏸️';
+            document.getElementById('start-timer-btn').disabled = true; // Disable start button
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById('timer-display').innerText = formatTime(secondsElapsed);
+            }, 1000);
+
+            console.log('Started timer for project ID:', projectId); // Logging selected project
+        }
+
+
+function pauseTimer() {
+    isTimerRunning = false;
+    document.getElementById('play-pause-btn').innerHTML = '▶️';
+    clearInterval(timerInterval);
+}
+
+function resetTimer() {
+    secondsElapsed = 0;
+    document.getElementById('timer-display').innerText = '00:00:00';
+    pauseTimer();
+    document.getElementById('start-timer-btn').disabled = false; // Re-enable start button
+}
+
+function formatTime(seconds) {
+    const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    return `${hours}:${minutes}:${secs}`;
+}
+
+// Save timer data to the server
+function saveTimer() {
+    const projectName = document.getElementById('project-search').value;
+    const timeSpent = secondsElapsed;
+
+    fetch('http://localhost:3001/timer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ projectName, timeSpent }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Timer data saved successfully!');
+        closeModal('web-timer-modal');
+        resetTimer(); // Reset timer when saving
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Update the event listener for the "Start" button
+document.getElementById('start-timer-btn').addEventListener('click', () => {
+    startTimer();
+});
+
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    fetchRecentScreenshots();  // Fetch recent screenshots on page load
+
+    // Add event listener to capture screenshot button
+    document.getElementById('capture-screenshot-btn').addEventListener('click', captureScreenshot);
+});
+
+// Function to capture a screenshot
+function captureScreenshot() {
+    fetch('http://localhost:3001/api/take-screenshot', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId: 'user123' })  // Send the user ID (change as needed)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.screenshot) {
+            // Screenshot was successfully saved, now update the recent screenshots
+            fetchRecentScreenshots();
+        } else {
+            console.error('Error:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error taking screenshot:', error);
+    });
+}
+
+// Function to fetch recent screenshots and display them
+function fetchRecentScreenshots() {
+    fetch('http://localhost:3001/api/recent-screenshots')
+        .then(response => response.json())
+        .then(screenshots => {
+            const screenshotsContainer = document.getElementById('recent-screenshots');
+            screenshotsContainer.innerHTML = '';  // Clear existing screenshots
+
+            screenshots.forEach(screenshot => {
+                const img = document.createElement('img');
+                img.src = screenshot.imagePath;  // Set the image source to the screenshot path
+                img.alt = `Screenshot taken at ${new Date(screenshot.timestamp).toLocaleString()}`;
+                img.width = 200;  // Set desired width
+                img.height = 150;  // Set desired height
+
+                screenshotsContainer.appendChild(img);  // Add the image to the container
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching recent screenshots:', error);
+        });
+}
+
+    </script>
+</body>
+</html>
