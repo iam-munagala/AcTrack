@@ -331,5 +331,95 @@ button:focus {
 .project-list div:hover {
     background-color: #ecf0f1; /* Light hover effect */
 }
+/* Floating Timer Window */
+.floating-timer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 200px;
+    height: 100px;
+    background-color: #333;
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    display: none;  /* Hidden by default */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    text-align: center;
+}
 
+.floating-timer .timer-display {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.floating-timer button {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.floating-timer button:hover {
+    background-color: #ff3333;
+}
+
+/* Floating Timer Window */
+.floating-timer {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 200px;
+    height: 120px;
+    background-color: #333;
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    display: none;  /* Hidden by default */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    text-align: center;
+    cursor: move;
+}
+
+/* Draggable Header */
+.floating-timer-header {
+    padding: 10px;
+    background-color: #444;
+    cursor: move;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px solid #555;
+}
+
+.floating-timer .timer-display {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.floating-timer button {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.floating-timer button:hover {
+    background-color: #ff3333;
+}
+#week-range {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0;
+    text-align:left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
