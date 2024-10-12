@@ -85,6 +85,7 @@ app.post('/projects', async (req, res) => {
         });
 
         const savedProject = await newProject.save();
+        console.log(savedProject)
         res.status(201).json(savedProject);
     } catch (error) {
         console.error('Error saving project:', error);  // Detailed error logging
