@@ -279,27 +279,7 @@
 
         // Example: Chart.js for activity graph
         const ctx = document.getElementById('activity-chart').getContext('2d');
-        // const activityChart = new Chart(ctx, {
-        //     type: 'line',
-        //     data: {
-        //         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        //         datasets: [{
-        //             label: 'Activity',
-        //             data: [12, 19, 3, 5, 2, 3, 7],
-        //             borderColor: 'rgba(75, 192, 192, 1)',
-        //             borderWidth: 1,
-        //             fill: false,
-        //         }]
-        //     },
-        //     options: {
-        //         scales: {
-        //             y: {
-        //                 beginAtZero: true
-        //             }
-        //         }
-        //     }
-        // });
-        // document.addEventListener('DOMContentLoaded', () => {
+        
     fetchProjectCount();
 // });
 
@@ -388,30 +368,6 @@ function toggleTimer() {
                 fetchProjects(); // Fetch projects when opening the web-timer modal
             }
         }
-
-
-// // Save timer data to the server
-// function saveTimer() {
-//     const projectName = document.getElementById('project-search').value;
-//     const timeSpent = secondsElapsed;
-
-//     fetch('http://localhost:5000/timer', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ projectName, timeSpent }),
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         alert('Timer data saved successfully!');
-//         closeModal('web-timer-modal');
-//         resetTimer(); // Reset timer when saving
-//     })
-//     .catch(error => {
-//         console.error('Error:', error);
-//     });
-// }
 
 // Update the event listener for the "Start" button
 document.getElementById('start-timer-btn').addEventListener('click', () => {
@@ -600,8 +556,6 @@ function makeDraggable(element, dragHandle) {
         document.onmousemove = null;
     }
 }
-
-
 // Add event listener to the stop button in the floating timer
 document.getElementById('floating-stop-btn').addEventListener('click', stopTimer);
 
@@ -893,14 +847,14 @@ function createActivityGraph(labels, mouseUsage, keyboardUsage) {
             datasets: [
                 {
                     label: 'Mouse Usage (%)',
-                    data: mouseUsage, // Mouse usage percentage per day
+                    data: mouseUsage, // Mouse usage percentage 
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1,
                     fill: false
                 },
                 {
                     label: 'Keyboard Usage (%)',
-                    data: keyboardUsage, // Keyboard usage percentage per day
+                    data: keyboardUsage, // Keyboard usage percentage
                     borderColor: 'rgba(192, 75, 75, 1)',
                     borderWidth: 1,
                     fill: false
@@ -934,9 +888,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchWorkedTimeThisWeek(); // Fetch total worked time for this week
     fetchActivityThisWeek();   // Fetch activity data for the current week and display graph
 });
-
-
-
-    </script>
+</script>
 </body>
 </html>
