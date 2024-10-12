@@ -85,7 +85,6 @@ app.post('/projects', async (req, res) => {
         });
 
         const savedProject = await newProject.save();
-        console.log(savedProject)
         res.status(201).json(savedProject);
     } catch (error) {
         console.error('Error saving project:', error);  // Detailed error logging
@@ -256,16 +255,9 @@ app.get('/api/get-activity/:userId', (req, res) => {
 app.get('/api/get-screenshots/:userId', (req, res) => {
     const userId = req.params.userId;
     Screenshot.find({ userId: userId })
-        .then(screenshots => {
-            console.log('Retrieved Screenshots:', screenshots);  // Log the screenshots to the console
-            res.json(screenshots);  // Send the screenshots in the response
-        })
-        .catch(err => {
-            console.error('Error retrieving screenshots:', err);  // Log the error to the console
-            res.status(500).json({ error: 'Error retrieving screenshots', details: err });
-        });
+        .then(screenshots => res.json(screenshots))
+        .catch(err => res.status(500).json({ error: 'Error retrieving screenshots', details: err }));
 });
-
 
 // API to get recent screenshots
 app.get('/api/recent-screenshots', async (req, res) => {
