@@ -6,13 +6,15 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const nodemailer = require('nodemailer'); 
-require('dotenv').config();  // Load environment variables from .env file
+const dotenv=require('dotenv');
+require('dotenv').config();
+
 
 const app = express();
 const PORT = 5000;
 
 // MongoDB connection
-const mongoURI = 'mongodb://127.0.0.1:27017/userActivityDB'; // Update this if using MongoDB Atlas
+const mongoURI = process.env.MONGO_URI; 
 mongoose.connect(mongoURI, {})
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log('MongoDB connection error:', err));
@@ -31,8 +33,7 @@ mongoose.connect(mongoURI, {})
             basedOn: { type: String, default: '' },
             cost: { type: Number, default: 0 }
         },
-        teams: { type: [String], default: [] },
-        lastWorked: { type: Date, default: null }
+        teams: { type: [String], default: [] }
     });
     
     
@@ -418,7 +419,8 @@ const userActivitySchema = new mongoose.Schema({
     keyboardEvents: { type: Number, default: 0 }, // Keyboard activity count
     totalTime: { type: Number, default: 0 }, // Total time in seconds
     mouseUsagePercentage: Number,  // Calculated percentage of mouse usage
-    keyboardUsagePercentage: Number // Calculated percentage of keyboard usage
+    keyboardUsagePercentage: Number, // Calculated percentage of keyboard usage
+    projectName: String
 });
 
 const UserActivity = mongoose.model('UserActivity', userActivitySchema);

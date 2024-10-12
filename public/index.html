@@ -40,8 +40,9 @@
                     <p id="worked-time">0 hrs 0 mins</p>
                 </div>
                 <div class="card">
-                    <h3>Idle Time This Week</h3>
-                    <p id="idle-time">0 hrs 0 mins</p>
+                    <h3>Last Worked</h3>
+                    <!-- <p id="last-project-worked">Loading...</p> -->
+                    <p id="last-worked-time">Loading...</p>
                 </div>
                 <div class="card">
                     <h3 > Total Projects Worked</h3>
@@ -449,11 +450,11 @@ function startTimer() {
     timerInterval = setInterval(() => {
         secondsElapsed++;
         const formattedTime = formatTime(secondsElapsed);
-        document.getElementById('floating-timer-display').innerText = formattedTime;  // Update in floating window
+        document.getElementById('floating-timer-display').innerText = formattedTime; 
     }, 1000);
 
     // Start capturing screenshots every 10 minutes after starting the timer
-    screenshotInterval = setInterval(captureScreenshot, 600000); // Every 10 minutes
+    screenshotInterval = setInterval(captureScreenshot, 6000); // Every 10 minutes
     startActivityTracking();
 }
 
@@ -933,6 +934,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchWorkedTimeThisWeek(); // Fetch total worked time for this week
     fetchActivityThisWeek();   // Fetch activity data for the current week and display graph
 });
+
+
 
     </script>
 </body>
