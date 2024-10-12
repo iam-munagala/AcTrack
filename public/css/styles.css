@@ -207,7 +207,7 @@ header {
 }
 
 .graph-container {
-    margin-left: 10px;
+    margin-left: 20px;
 }
 
 .modal {
@@ -489,7 +489,7 @@ button:focus {
 }
 
 .floating-timer .timer-display {
-    font-size: 24px;
+    font-size: 20px;
     margin-bottom: 10px;
 }
 
@@ -541,4 +541,3 @@ tr:hover {
 h2 {
     text-align: center;
 }
-

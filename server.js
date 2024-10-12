@@ -510,3 +510,26 @@ app.get('/api/activity-this-week/:userId', async (req, res) => {
         res.status(500).json({ message: 'Error fetching activity for this week', details: error.message });
     }
 });
+// Fetch the most recent screenshot for the user
+app.get('/api/last-screenshot/:userId', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        // Find the most recent screenshot for the given user
+        const lastScreenshot = await Screenshot.findOne({ userId: userId })
+            .sort({ timestamp: -1 })  // Sort by most recent screenshot (descending)
+            .exec();
+
+        if (!lastScreenshot) {
+            return res.status(404).json({ message: 'No screenshot found for this user.' });
+        }
+
+        // Return the timestamp of the last screenshot
+        res.status(200).json({
+            lastScreenshotTime: lastScreenshot.timestamp
+        });
+    } catch (error) {
+        console.error('Error fetching last screenshot:', error);
+        res.status(500).json({ message: 'Error fetching last screenshot', details: error.message });
+    }
+});
