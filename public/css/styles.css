@@ -9,12 +9,29 @@ body {
     height: 100vh;
 }
 
+/* Sidebar Styles */
 .sidebar {
     width: 200px;
     background-color: #333;
     color: white;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar .logo h2 {
+    font-size: 28px;
+    color: #8ccae6;
+    font-family:  Arial;
 }
 
 .sidebar ul {
@@ -24,16 +41,91 @@ body {
 
 .sidebar ul li {
     margin: 15px 0;
+    padding: 10px;
+    transition: background 0.3s ease;
+}
+
+.sidebar ul li:hover {
+    background-color: #444;
+    border-radius: 4px;
 }
 
 .sidebar ul li a {
     color: white;
     text-decoration: none;
+    display: block;
+    font-size: 18px;
+    padding-left: 10px;
+}
+
+.sidebar ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Sidebar Hover Effect */
+.sidebar ul li a::before {
+    content: "→";
+    margin-right: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar ul li:hover a::before {
+    opacity: 1;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+        padding: 10px;
+    }
+
+    .sidebar .logo h2 {
+        font-size: 18px;
+    }
+
+    .sidebar ul li {
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    .sidebar ul li a {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .sidebar ul li a::before {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .sidebar ul {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .sidebar ul li {
+        margin: 0;
+    }
+
+    .sidebar ul li a {
+        padding: 15px;
+        font-size: 14px;
+    }
 }
 
 .dashboard-content {
-    flex-grow: 1;
+    flex-grow:100;
     padding: 20px;
+    margin-left:15%;
     overflow-y: auto;
     background-color: #f4f4f4;
 }
@@ -79,6 +171,7 @@ header {
 
 .card {
     background: #fff;
+    display:flexbox;
     padding: 20px;
     border-radius: 5px;
     text-align: center;
@@ -421,5 +514,31 @@ button:focus {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* CSS to style the recent projects table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+h2 {
+    text-align: center;
 }
 

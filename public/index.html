@@ -94,9 +94,9 @@
             </div>
 
             <div id="members" class="tab-content ">
-                <input type="search" placeholder="Search Managers" id="managers">
-                <input type="search" placeholder="Search Users" id="users">
-                <input type="search" placeholder="Search Viewers" id="viewers">
+                <input type="search" placeholder="Enter Managers" id="managers">
+                <input type="search" placeholder="Enter Users" id="users">
+                <input type="search" placeholder="Enter Viewers" id="viewers">
                 <div class="modal-footer">
                     <button onclick="openTab(event, 'budget-limits')">Next</button>
                     <button onclick="closeModal('create-project-modal')">Cancel</button>
@@ -124,7 +124,7 @@
             </div>
 
             <div id="teams" class="tab-content">
-                <input type="search" placeholder="Search Teams" id="teams-search">
+                <input type="search" placeholder="Enter Teams" id="teams-search">
                 <div class="modal-footer">
                     <button onclick="saveDetails()">Save</button>
                     <button onclick="closeModal('create-project-modal')">Cancel</button>
@@ -241,28 +241,6 @@
             }
         }
 
-        function saveTimer() {
-            const project = document.getElementById('project-search').value;
-            const todo = document.getElementById('todo-search').value;
-            const timeSpent = secondsElapsed;
-
-            fetch('http://localhost:5000/timer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ project, todo, timeSpent }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Timer data saved successfully!');
-                closeModal('web-timer-modal');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-
         function saveDetails() {
             const projectName = document.getElementById('project-name').value;
             const clientName = document.getElementById('client-name').value;
@@ -300,29 +278,29 @@
 
         // Example: Chart.js for activity graph
         const ctx = document.getElementById('activity-chart').getContext('2d');
-        const activityChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Activity',
-                    data: [12, 19, 3, 5, 2, 3, 7],
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                    fill: false,
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        document.addEventListener('DOMContentLoaded', () => {
+        // const activityChart = new Chart(ctx, {
+        //     type: 'line',
+        //     data: {
+        //         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        //         datasets: [{
+        //             label: 'Activity',
+        //             data: [12, 19, 3, 5, 2, 3, 7],
+        //             borderColor: 'rgba(75, 192, 192, 1)',
+        //             borderWidth: 1,
+        //             fill: false,
+        //         }]
+        //     },
+        //     options: {
+        //         scales: {
+        //             y: {
+        //                 beginAtZero: true
+        //             }
+        //         }
+        //     }
+        // });
+        // document.addEventListener('DOMContentLoaded', () => {
     fetchProjectCount();
-});
+// });
 
 function fetchProjectCount() {
     fetch('http://localhost:5000/projects/count')
@@ -411,28 +389,28 @@ function toggleTimer() {
         }
 
 
-// Save timer data to the server
-function saveTimer() {
-    const projectName = document.getElementById('project-search').value;
-    const timeSpent = secondsElapsed;
+// // Save timer data to the server
+// function saveTimer() {
+//     const projectName = document.getElementById('project-search').value;
+//     const timeSpent = secondsElapsed;
 
-    fetch('http://localhost:5000/timer', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ projectName, timeSpent }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert('Timer data saved successfully!');
-        closeModal('web-timer-modal');
-        resetTimer(); // Reset timer when saving
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
+//     fetch('http://localhost:5000/timer', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ projectName, timeSpent }),
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         alert('Timer data saved successfully!');
+//         closeModal('web-timer-modal');
+//         resetTimer(); // Reset timer when saving
+//     })
+//     .catch(error => {
+//         console.error('Error:', error);
+//     });
+// }
 
 // Update the event listener for the "Start" button
 document.getElementById('start-timer-btn').addEventListener('click', () => {
@@ -476,6 +454,7 @@ function startTimer() {
 
     // Start capturing screenshots every 10 minutes after starting the timer
     screenshotInterval = setInterval(captureScreenshot, 600000); // Every 10 minutes
+    startActivityTracking();
 }
 
 function stopTimer() {
@@ -514,6 +493,7 @@ function stopTimer() {
         // Reset timer UI
         document.getElementById('floating-timer').style.display = 'none';
         secondsElapsed = 0;
+        stopActivityTracking();
     }
 }
 
@@ -720,21 +700,239 @@ const projectData = {
     cost: document.getElementById('cost').value,
     teamsSearch: document.getElementById('teamsSearch').value // Assuming teams are input here
 };
+    </script>
+    <script>
+        let mouseEvents = 0;
+let keyboardEvents = 0;
+let activityInterval;
+let totalTime = 0;
 
-const socket = io('http://localhost:5000'); // Connect to your server
+// Add event listeners for mouse and keyboard activity
+document.addEventListener('mousemove', () => mouseEvents++);
+document.addEventListener('keydown', () => keyboardEvents++);
 
-// Listen for activity updates from the server
-socket.on('activity-update', (data) => {
-    const { productiveTime, idleTime } = data;
+// Start tracking activity when the timer starts
+function startActivityTracking() {
+    mouseEvents = 0;
+    keyboardEvents = 0;
+    totalTime = 0;
 
-    // Update your dashboard cards or graphs here
-    document.getElementById('productive-time').innerText = `Productive Time: ${productiveTime} seconds`;
-    document.getElementById('idle-time').innerText = `Idle Time: ${idleTime} seconds`;
+    // Track every second
+    activityInterval = setInterval(() => {
+        totalTime++; // Track total time in seconds
 
-    // You can also update graphs or charts accordingly
+        // Periodically (e.g., every minute) send the data to the server
+        if (totalTime % 60 === 0) {
+            sendActivityData();
+        }
+
+    }, 1000); // 1-second interval
+}
+
+// Stop tracking activity
+function stopActivityTracking() {
+    clearInterval(activityInterval);
+    sendActivityData(); // Send the final activity data
+}
+
+// Function to calculate percentages and send activity data to the server
+function sendActivityData() {
+    const mouseUsagePercentage = (mouseEvents / totalTime) * 100;
+    const keyboardUsagePercentage = (keyboardEvents / totalTime) * 100;
+
+    fetch('http://localhost:5000/api/save-activity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            userId: 'user123', // Replace with actual user ID
+            projectId: document.getElementById('project-select').value,
+            mouseEvents: mouseEvents,
+            keyboardEvents: keyboardEvents,
+            totalTime: totalTime,
+            mouseUsagePercentage: mouseUsagePercentage.toFixed(2),
+            keyboardUsagePercentage: keyboardUsagePercentage.toFixed(2),
+        }),
+    })
+    .then(response => response.json())
+    .then(data => console.log('Activity data saved:', data))
+    .catch(error => console.error('Error saving activity data:', error));
+
+    // Reset mouse and keyboard event counts for the next interval
+    mouseEvents = 0;
+    keyboardEvents = 0;
+}
+function fetchActivityData() {
+    const projectId = document.getElementById('project-select').value;
+    fetch(`http://localhost:5000/api/get-activity/${projectId}`)
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(entry => new Date(entry.date).toLocaleTimeString());
+            const mouseUsage = data.map(entry => entry.mouseUsagePercentage);
+            const keyboardUsage = data.map(entry => entry.keyboardUsagePercentage);
+
+            // Create the activity chart
+            const ctx = document.getElementById('activity-chart').getContext('2d');
+            const activityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels, // Time labels for x-axis
+                    datasets: [{
+                        label: 'Mouse Usage (%)',
+                        data: mouseUsage,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false,
+                    }, {
+                        label: 'Keyboard Usage (%)',
+                        data: keyboardUsage,
+                        borderColor: 'rgba(192, 75, 75, 1)',
+                        borderWidth: 1,
+                        fill: false,
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100, // Limit the y-axis to 100%
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching activity data:', error));
+}
+
+// Call this function when the page loads or when a project is selected
+fetchActivityData();
+
+function fetchWorkedTimeThisWeek() {
+    const userId = 'user123'; // Replace with actual user ID
+
+    fetch(`http://localhost:5000/api/total-worked-time-this-week/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            const totalSeconds = data.totalWorkedSeconds;
+            const formattedTime = formatTime(totalSeconds); // Convert seconds to hours, minutes, and seconds
+
+            // Update the "Worked This Week" container with the formatted time
+            document.getElementById('worked-time').innerText = formattedTime;
+        })
+        .catch(error => {
+            console.error('Error fetching worked time for this week:', error);
+        });
+}
+
+// Utility function to format time in HH:MM:SS
+function formatTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${hours} hrs ${minutes} mins ${seconds} secs`;
+}
+
+// Fetch the worked time when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    fetchRecentScreenshots();  // Existing call to fetch recent screenshots
+    fetchWorkedTimeThisWeek(); // Fetch total worked time for this week
 });
+// Fetch activity data for the current week
+function fetchActivityThisWeek() {
+    const userId = 'user123'; // Replace with actual user ID
 
+    fetch(`http://localhost:5000/api/activity-this-week/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Parse the activity data and prepare it for the chart
+            const labels = getWeekDays(); // Get labels for the current week (Sunday to Saturday)
+            const mouseUsage = new Array(7).fill(0); // Initialize with zeros for each day
+            const keyboardUsage = new Array(7).fill(0);
 
+            // Populate the mouse and keyboard usage data
+            data.forEach(entry => {
+                const dayIndex = new Date(entry.date).getDay(); // Get the day index (0 = Sunday, 6 = Saturday)
+                mouseUsage[dayIndex] = entry.mouseUsagePercentage;  // Assign mouse usage percentage to the corresponding day
+                keyboardUsage[dayIndex] = entry.keyboardUsagePercentage; // Assign keyboard usage percentage to the corresponding day
+            });
+
+            // Create the activity graph
+            createActivityGraph(labels, mouseUsage, keyboardUsage);
+        })
+        .catch(error => {
+            console.error('Error fetching activity data for this week:', error);
+        });
+}
+
+// Function to get labels for the days of the current week (Sunday to Saturday)
+function getWeekDays() {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const now = new Date();
+    const currentDay = now.getDay();
+
+    // Generate labels from Sunday to Saturday
+    const weekDays = [];
+    for (let i = 0; i < 7; i++) {
+        const dayIndex = (currentDay + i) % 7; // Wrap around the week
+        weekDays.push(days[dayIndex]);
+    }
+    return days;
+}
+
+// Function to create the activity graph using Chart.js
+function createActivityGraph(labels, mouseUsage, keyboardUsage) {
+    const ctx = document.getElementById('activity-chart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels, // The days of the week
+            datasets: [
+                {
+                    label: 'Mouse Usage (%)',
+                    data: mouseUsage, // Mouse usage percentage per day
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false
+                },
+                {
+                    label: 'Keyboard Usage (%)',
+                    data: keyboardUsage, // Keyboard usage percentage per day
+                    borderColor: 'rgba(192, 75, 75, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100, // Limit the y-axis to 100%
+                    title: {
+                        display: true,
+                        text: 'Usage Percentage (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Days of the Week'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Fetch the activity data when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    fetchRecentScreenshots();  // Existing call to fetch recent screenshots
+    fetchWorkedTimeThisWeek(); // Fetch total worked time for this week
+    fetchActivityThisWeek();   // Fetch activity data for the current week and display graph
+});
 
     </script>
 </body>

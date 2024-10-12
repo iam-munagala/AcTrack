@@ -200,18 +200,18 @@ app.post('/projects/teams', async (req, res) => {
     }
 });
 
-// Define the User Activity schema
-const userActivitySchema = new mongoose.Schema({
-    userId: String,
-    date: { type: Date, default: Date.now },
-    workedTime: Number,   // In minutes
-    idleTime: Number,     // In minutes
-    mouseActivity: Number,   // Mouse event count
-    keyboardActivity: Number // Keyboard event count
-});
+// // Define the User Activity schema
+// const userActivitySchema = new mongoose.Schema({
+//     userId: String,
+//     date: { type: Date, default: Date.now },
+//     workedTime: Number,   // In minutes
+//     idleTime: Number,     // In minutes
+//     mouseActivity: Number,   // Mouse event count
+//     keyboardActivity: Number // Keyboard event count
+// });
 
 // Create models
-const UserActivity = mongoose.model('UserActivity', userActivitySchema);
+// const UserActivity = mongoose.model('UserActivity', userActivitySchema);
 
 // Take a screenshot and save it to MongoDB
 app.post('/api/take-screenshot', async (req, res) => {
@@ -363,20 +363,148 @@ app.post('/api/save-time-entry', async (req, res) => {
     }
 });
 // Example: Update when starting the timer
+// Example: Update when starting the timer
 app.post('/start-timer', async (req, res) => {
     const { projectId } = req.body;
     try {
         // Update the last worked date when the timer starts
-        await Project.findByIdAndUpdate(projectId, { lastWorked: new Date() });
+        const updatedProject = await Project.findByIdAndUpdate(
+            projectId,
+            { lastWorked: new Date() }, // Update to current date
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedProject) {
+            return res.status(404).json({ message: 'Project not found.' });
+        }
+
         // Start timer logic...
-        res.status(200).json({ message: 'Timer started and project updated.' });
+        res.status(200).json({ message: 'Timer started and project updated.', project: updatedProject });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
+
 // Example: Update when stopping the timer
+// Endpoint to stop the timer
 app.post('/stop-timer', async (req, res) => {
-    // Timer stop logic...
-    res.status(200).json({ message: 'Timer stopped.' });
+    const { projectId } = req.body; // Assuming you send projectId when stopping the timer
+
+    try {
+        // Update the last worked date when the timer stops
+        const updatedProject = await Project.findByIdAndUpdate(
+            projectId,
+            { lastWorked: new Date() }, // Set to current date and time
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedProject) {
+            return res.status(404).json({ message: 'Project not found.' });
+        }
+
+        // Stop timer logic...
+        res.status(200).json({ message: 'Timer stopped and project updated.', project: updatedProject });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+const userActivitySchema = new mongoose.Schema({
+    userId: String,          // User ID for tracking activity
+    projectId: String,       // ID of the project being worked on
+    date: { type: Date, default: Date.now }, // Date and time of activity
+    mouseEvents: { type: Number, default: 0 }, // Mouse activity count
+    keyboardEvents: { type: Number, default: 0 }, // Keyboard activity count
+    totalTime: { type: Number, default: 0 }, // Total time in seconds
+    mouseUsagePercentage: Number,  // Calculated percentage of mouse usage
+    keyboardUsagePercentage: Number // Calculated percentage of keyboard usage
+});
+
+const UserActivity = mongoose.model('UserActivity', userActivitySchema);
+app.post('/api/save-activity', async (req, res) => {
+    const { userId, projectId, mouseEvents, keyboardEvents, totalTime, mouseUsagePercentage, keyboardUsagePercentage } = req.body;
+
+    try {
+        const newActivity = new UserActivity({
+            userId,
+            projectId,
+            mouseEvents,
+            keyboardEvents,
+            totalTime,
+            mouseUsagePercentage,
+            keyboardUsagePercentage,
+        });
+
+        const savedActivity = await newActivity.save();
+        res.status(201).json(savedActivity);
+    } catch (error) {
+        console.error('Error saving user activity:', error);
+        res.status(500).json({ message: 'Error saving user activity', details: error.message });
+    }
+});
+app.get('/api/get-activity/:projectId', async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const activities = await UserActivity.find({ projectId }).sort({ date: 1 }); // Sort by date
+        res.status(200).json(activities);
+    } catch (error) {
+        console.error('Error fetching activity data:', error);
+        res.status(500).json({ message: 'Error fetching activity data', details: error.message });
+    }
+});
+app.get('/api/total-worked-time-this-week/:userId', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        // Get the start and end of the current week (Sunday to Saturday)
+        const now = new Date();
+        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())); // Get Sunday of this week
+        startOfWeek.setHours(0, 0, 0, 0); // Set to midnight
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(endOfWeek.getDate() + 6); // Set to Saturday
+        endOfWeek.setHours(23, 59, 59, 999); // Set to end of the day
+
+        // Find all time entries for the current week
+        const timeEntries = await TimeEntry.find({
+            userId: userId,
+            date: { $gte: startOfWeek, $lte: endOfWeek } // Filter time entries between Sunday and Saturday
+        });
+
+        // Sum up the total worked time (in seconds)
+        const totalWorkedSeconds = timeEntries.reduce((acc, entry) => acc + entry.workedTime, 0);
+
+        res.status(200).json({ totalWorkedSeconds });
+    } catch (error) {
+        console.error('Error fetching worked time for the week:', error);
+        res.status(500).json({ message: 'Error fetching worked time for the week', details: error.message });
+    }
+});
+app.get('/api/activity-this-week/:userId', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        // Get the start and end of the current week (Sunday to Saturday)
+        const now = new Date();
+        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())); // Get Sunday of this week
+        startOfWeek.setHours(0, 0, 0, 0); // Set to midnight
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(endOfWeek.getDate() + 6); // Set to Saturday
+        endOfWeek.setHours(23, 59, 59, 999); // Set to end of the day
+
+        // Fetch user activity for the current week
+        const activityThisWeek = await UserActivity.find({
+            userId: userId,
+            date: { $gte: startOfWeek, $lte: endOfWeek }
+        }).sort({ date: 1 }); // Sort by date to get activities from Sunday to Saturday
+
+        // Send activity data to the frontend
+        res.status(200).json(activityThisWeek);
+    } catch (error) {
+        console.error('Error fetching activity for this week:', error);
+        res.status(500).json({ message: 'Error fetching activity for this week', details: error.message });
+    }
 });
