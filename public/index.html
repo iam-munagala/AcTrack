@@ -308,7 +308,7 @@
         const cost = document.getElementById("budget-cost").value;
         const teamsSearch = document.getElementById("teams-search").value;
 
-        fetch("https://ac-track-rouge.vercel.app/projects", {
+        fetch("https://actrack-floz.onrender.com/projects", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -349,7 +349,7 @@
       // });
 
       function fetchProjectCount() {
-        fetch("https://ac-track-rouge.vercel.app/projects/count")
+        fetch("https://actrack-floz.onrender.com/projects/count")
           .then((response) => response.json())
           .then((data) => {
             document.getElementById("projects-worked").innerText = data.count;
@@ -407,7 +407,7 @@
 
       // Fetch projects from the server and populate the dropdown
       function fetchProjects() {
-        fetch("https://ac-track-rouge.vercel.app/projects")
+        fetch("https://actrack-floz.onrender.com/projects")
           .then((response) => response.json())
           .then((data) => {
             projects = data; // Store projects
@@ -499,7 +499,7 @@
           const projectId = projectSelect.value;
           const workedTime = secondsElapsed; // Time in seconds
 
-          fetch("https://ac-track-rouge.vercel.app/api/save-time-entry", {
+          fetch("https://actrack-floz.onrender.com/api/save-time-entry", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -551,7 +551,7 @@
 
       // Capture a screenshot
       function captureScreenshot() {
-        fetch("https://ac-track-rouge.vercel.app/api/take-screenshot", {
+        fetch("https://actrack-floz.onrender.com/api/take-screenshot", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -574,7 +574,7 @@
 
       // Function to fetch recent screenshots (assumed to be defined elsewhere)
       function fetchRecentScreenshots() {
-        fetch("https://ac-track-rouge.vercel.app/api/recent-screenshots")
+        fetch("https://actrack-floz.onrender.com/api/recent-screenshots")
           .then((response) => response.json())
           .then((screenshots) => {
             const screenshotsContainer =
@@ -658,7 +658,7 @@
         }
 
         // Send invitation email via API
-        fetch("https://ac-track-rouge.vercel.app/api/send-invite", {
+        fetch("https://actrack-floz.onrender.com/api/send-invite", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -783,7 +783,7 @@
         const mouseUsagePercentage = (mouseEvents / totalTime) * 100;
         const keyboardUsagePercentage = (keyboardEvents / totalTime) * 100;
 
-        fetch("https://ac-track-rouge.vercel.app/api/save-activity", {
+        fetch("https://actrack-floz.onrender.com/api/save-activity", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -810,7 +810,7 @@
       }
       function fetchActivityData() {
         const projectId = document.getElementById("project-select").value;
-        fetch(`https://ac-track-rouge.vercel.app/api/get-activity/${projectId}`)
+        fetch(`https://actrack-floz.onrender.com/api/get-activity/${projectId}`)
           .then((response) => response.json())
           .then((data) => {
             const labels = data.map((entry) =>
@@ -868,7 +868,7 @@
         const userId = "user123"; // Replace with actual user ID
 
         fetch(
-          `https://ac-track-rouge.vercel.app/api/total-worked-time-this-week/${userId}`
+          `https://actrack-floz.onrender.com/api/total-worked-time-this-week/${userId}`
         )
           .then((response) => response.json())
           .then((data) => {
@@ -902,7 +902,7 @@
         const userId = "user123"; // Replace with actual user ID
 
         fetch(
-          `https://ac-track-rouge.vercel.app/api/activity-this-week/${userId}`
+          `https://actrack-floz.onrender.com/api/activity-this-week/${userId}`
         )
           .then((response) => response.json())
           .then((data) => {
@@ -1006,7 +1006,7 @@
         const userId = "user123"; // Replace with actual user ID
 
         // Make the API call to fetch the last screenshot
-        fetch(`https://ac-track-rouge.vercel.app/api/last-screenshot/${userId}`)
+        fetch(`https://actrack-floz.onrender.com/api/last-screenshot/${userId}`)
           .then((response) => response.json()) // Parse the response as JSON
           .then((data) => {
             // Check if we received the last screenshot time
