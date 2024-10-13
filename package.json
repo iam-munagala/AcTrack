@@ -17,6 +17,7 @@
     "mongoose": "^8.7.0",
     "node-machine-id": "^1.1.12",
     "nodemailer": "^6.9.15",
-    "screenshot-desktop": "^1.15.0"
+    "screenshot-desktop": "^1.15.0",
+    "vercel": "^37.8.0"
   }
 }
