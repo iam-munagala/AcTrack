@@ -166,7 +166,7 @@ header {
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 20px;
 }
 
@@ -664,8 +664,9 @@ h2 {
     }
 
     .sidebar ul li a {
-        font-size: 14px;
+        font-size: 12px;
         padding: 10px;
+        text-align: left;
     }
 
     /* Ensure dashboard content fits within the screen */
@@ -704,5 +705,52 @@ h2 {
         overflow-y: auto;
         background-color: #f4f4f4;
         box-sizing: border-box;
+    }
+}
+@media (max-width: 768px) {
+    .floating-timer {
+        width: 80%; /* Adjust width for smaller screens */
+        bottom: 10px;
+        right: 10px;
+        padding: 10px; /* Reduce padding */
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .floating-timer {
+        width: 25%; /* Full width */
+        bottom: 5px;
+        right: 5px;
+        padding: 4px;
+        font-size: 4px;
+    }
+    .floating-timer .stop-button {
+        padding: 8px 16px; /* Reduce padding for tablets */
+        font-size: 8px; /* Smaller font size */
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 80%; /* Adjust width for tablets */
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal {
+        top: 60px; /* Adjust top so modal appears below sidebar */
+    }
+    .modal-content {
+        width: 90%; /* Full width for mobile */
+        padding: 10px;
+    }
+
+    /* Ensure modal content is scrollable on smaller screens */
+    .modal-content {
+        height: auto;
+        max-height: 80vh; /* Max height to ensure visibility */
+        overflow-y: auto; /* Scroll if content exceeds modal height */
     }
 }
